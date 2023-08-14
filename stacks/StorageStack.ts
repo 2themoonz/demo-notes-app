@@ -1,6 +1,8 @@
-import { StackContext, Table } from "sst/constructs";
+import { Bucket, StackContext, Table } from "sst/constructs";
 
 export function StorageStack({ stack, app }: StackContext) {
+  // Create an S3 Bucket
+  const bucket = new Bucket(stack, "Attachments");
   // Create the DynamoDB Table
   const table = new Table(stack, "Notes", {
     fields: {
@@ -13,5 +15,8 @@ export function StorageStack({ stack, app }: StackContext) {
     },
   });
 
-  return table;
+  return {
+    bucket,
+    table,
+  };
 }
