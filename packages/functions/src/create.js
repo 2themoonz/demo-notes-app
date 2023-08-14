@@ -1,34 +1,23 @@
-import * as uuid from "uuid";
-import AWS from "aws-sdk";
 import { Table } from "sst/node/table";
+import * as uuid from "uuid";
+import handler from "@notes/core/handler";
+import dynamodb from "@notes/core/dynamodb";
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
-export async function main(event) {
+export const main = handler(async (event) => {
   const data = JSON.parse(event.body);
-
   const params = {
     TableName: Table.Notes.tableName,
     Item: {
-      userId: "123",
-      noteId: uuid.v1(),
-      content: data.content,
-      attachment: data.attachment,
-      createdAt: Date.now(),
+      // The attributes of the item to be created
+      userId: "123", // The id of the author
+      noteId: uuid.v1(), // A unique uuid
+      content: data.content, // Parsed from request body
+      attachment: data.attachment, // Parsed from request body
+      createdAt: Date.now(), // Current Unix timestamp
     },
   };
 
-  try {
-    await dynamoDb.put(params).promise();
+  await dynamodb.put(params);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(params.Item),
-    };
-  } catch (e) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: e.message }),
-    };
-  }
-}
+  return params.Item;
+});
