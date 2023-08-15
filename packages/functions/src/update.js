@@ -4,10 +4,11 @@ import dynamoDb from "@notes/core/dynamodb";
 
 export const main = handler(async (event) => {
   const data = JSON.parse(event.body);
+  const userId = event.requestContext.authorizer.iam.cognitoIdentity.identityId;
   const params = {
     TableName: Table.Notes.tableName,
     Key: {
-      userId: "123",
+      userId,
       noteId: event.pathParameters.id,
     },
     UpdateExpression: "SET content = :content, attachment = :attachment",
